@@ -5,15 +5,11 @@ app_name=shipping
 
 check_rootuser
 
-echo "Enter Mysql Root password" | tee -a $LOG_FILE
+echo "Enter Mysql Root password" 
 read -s MYSQL_ROOT_PASSWD
 
 app_setup
-
 maven_setup
-
-
-
 systemd_setup
 
 dnf install mysql -y  &>>$LOG_FILE
@@ -28,7 +24,7 @@ then
     mysql -h mysql.bittu27.site -uroot -p$MYSQL_ROOT_PASSWD < /app/db/master-data.sql &>>$LOG_FILE
     VALIDATE $? "Loading data into shipping"
 else
-    echo "Data is already loaded" | tee -a $LOG_FILE
+    echo -e "Data is already loaded $Y SO SKIPPING $N"
 fi
 
 systemctl restart shipping &>>$LOG_FILE
