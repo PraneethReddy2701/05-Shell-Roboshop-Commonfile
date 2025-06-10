@@ -25,7 +25,6 @@ check_rootuser()
     fi
 }
 
-
 VALIDATE()
 {
     if [ $1 -eq 0 ]
@@ -35,6 +34,59 @@ VALIDATE()
         echo -e "$2 is... $R FAILURE $N" | tee -a $LOG_FILE
         exit 1
     fi
+}
+
+nodejs_setup()
+{
+    dnf module disable nodejs -y &>>$LOG_FILE
+    VALIDATE $? "Disabling the nodejs default version"
+
+    dnf module enable nodejs:20 -y &>>$LOG_FILE
+    VALIDATE $? "Enabling the nodejs:20 version"
+
+    dnf install nodejs -y &>>$LOG_FILE
+    VALIDATE $? "Installing Nodejs"
+
+    npm install &>>$LOG_FILE
+    VALIDATE $? "Download dependencies"
+}
+
+app_setup()
+{
+    id roboshop
+    if [ $? -ne 0 ]
+    then
+        useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+        VALIDATE $? "Creating the roboshop system user"
+    else
+        echo -e "System user roboshop is already created.. $Y SO SKIPPING $N" 
+    fi
+
+    mkdir -p /app &>>$LOG_FILE
+    VALIDATE $? "Creating the app directory"
+
+    curl -o /tmp/$app_name.zip https://roboshop-artifacts.s3.amazonaws.com/$app_name-v3.zip  &>>$LOG_FILE
+    VALIDATE $? "Downloading the $app_name code"
+
+    rm -rf /app/*
+    cd /app
+    unzip /tmp/$app_name.zip &>>$LOG_FILE
+    VALIDATE $? "Unzipping the $app_name code"
+}
+
+systemd_setup()
+{
+    cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOG_FILE
+    VALIDATE $? "Copying the $app_name service file"
+
+    systemctl daemon-reload &>>$LOG_FILE
+    VALIDATE $? "Daemon-reload"
+
+    systemctl enable $app_name &>>$LOG_FILE
+    VALIDATE $? "Enabling $app_name"
+
+    systemctl start $app_name &>>$LOG_FILE
+    VALIDATE $? "Starting $app_name"
 }
 
 print_time()
