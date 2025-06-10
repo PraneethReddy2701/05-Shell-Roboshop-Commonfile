@@ -36,21 +36,6 @@ VALIDATE()
     fi
 }
 
-nodejs_setup()
-{
-    dnf module disable nodejs -y &>>$LOG_FILE
-    VALIDATE $? "Disabling the nodejs default version"
-
-    dnf module enable nodejs:20 -y &>>$LOG_FILE
-    VALIDATE $? "Enabling the nodejs:20 version"
-
-    dnf install nodejs -y &>>$LOG_FILE
-    VALIDATE $? "Installing Nodejs"
-
-    npm install &>>$LOG_FILE
-    VALIDATE $? "Download dependencies"
-}
-
 app_setup()
 {
     id roboshop
@@ -72,6 +57,45 @@ app_setup()
     cd /app
     unzip /tmp/$app_name.zip &>>$LOG_FILE
     VALIDATE $? "Unzipping the $app_name code"
+}
+
+nodejs_setup()
+{
+    dnf module disable nodejs -y &>>$LOG_FILE
+    VALIDATE $? "Disabling the nodejs default version"
+
+    dnf module enable nodejs:20 -y &>>$LOG_FILE
+    VALIDATE $? "Enabling the nodejs:20 version"
+
+    dnf install nodejs -y &>>$LOG_FILE
+    VALIDATE $? "Installing Nodejs"
+
+    npm install &>>$LOG_FILE
+    VALIDATE $? "Download dependencies"
+}
+
+maven_setup()
+{
+    dnf install maven -y &>>$LOG_FILE
+    VALIDATE $? "Installing Maven and Java"
+
+    mvn clean package &>>$LOG_FILE
+    VALIDATE $? "Downloading dependencies"
+
+    mv target/shipping-1.0.jar shipping.jar  &>>$LOG_FILE
+    VALIDATE $? "Copying and renaming Shipping jar file"
+}
+
+python_setup()
+{
+    dnf install python3 gcc python3-devel -y &>>$LOG_FILE
+    VALIDATE $? "Installing python3"
+
+    pip3 install -r requirements.txt &>>$LOG_FILE
+    VALIDATE $? "Downloading the dependencies"
+
+    cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOG_FILE
+    VALIDATE $? "Copying the $app_name service file"
 }
 
 systemd_setup()
