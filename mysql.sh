@@ -5,7 +5,7 @@ app_name=mysql
 
 check_rootuser
 
-echo "Please enter the Mysql rorot password"  | tee -a $LOG_FILE
+echo "Please enter the Mysql root password"  | tee -a $LOG_FILE
 read -s MYSQL_ROOT_PASSWORD
 
 dnf install mysql-server -y  &>>$LOG_FILE
