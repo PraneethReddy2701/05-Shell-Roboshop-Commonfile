@@ -98,6 +98,17 @@ python_setup()
     # VALIDATE $? "Copying the $app_name service file"
 }
 
+golang_setup()
+{
+    dnf install golang -y &>>$LOG_FILE
+    VALIDATE $? "Installing golang"
+
+    go mod init dispatch &>>$LOG_FILE
+    go get  &>>$LOG_FILE
+    go build &>>$LOG_FILE
+    VALIDATE $? "Downloading dependencies"
+}
+
 systemd_setup()
 {
     cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOG_FILE
