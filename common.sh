@@ -14,7 +14,7 @@ SCRIPT_DIR=$PWD
 mkdir -p $LOGS_FOLDER
 echo "Script started running at : $(date)"
 
-check_root()
+check_rootuser()
 {
     if [ $USER_ID -ne 0 ]
     then
