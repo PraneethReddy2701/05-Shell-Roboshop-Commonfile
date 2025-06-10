@@ -18,10 +18,10 @@ check_root()
 {
     if [ $USER_ID -ne 0 ]
     then
-        echo -e "ERROR : $R Please run the script with root access $N" 
+        echo -e "ERROR : $R Please run the script with root access $N" | tee -a $LOG_FILE
         exit 1
     else
-        echo "Running the script with root user" 
+        echo "Running the script with root user"  | tee -a $LOG_FILE
     fi
 }
 
