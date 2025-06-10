@@ -94,8 +94,8 @@ python_setup()
     pip3 install -r requirements.txt &>>$LOG_FILE
     VALIDATE $? "Downloading the dependencies"
 
-    cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOG_FILE
-    VALIDATE $? "Copying the $app_name service file"
+    # cp $SCRIPT_DIR/$app_name.service /etc/systemd/system/$app_name.service &>>$LOG_FILE
+    # VALIDATE $? "Copying the $app_name service file"
 }
 
 systemd_setup()
