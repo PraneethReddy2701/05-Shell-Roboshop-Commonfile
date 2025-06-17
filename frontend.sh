@@ -1,37 +1,9 @@
 #!/bin/bash
 
-START_TIME=$(date +%s)
-USER_ID=$(id -u)
-R="\e[31m"
-G="\e[32m"
-Y="\e[33m"
-N="\e[0m"
-LOGS_FOLDER="/var/log/roboshop-logs"
-SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
-LOG_FILE=$LOGS_FOLDER/$SCRIPT_NAME.log
-SCRIPT_DIR=$PWD
+source ./common.sh
+app_name=frontend
 
-mkdir -p $LOGS_FOLDER
-echo "Script started executing at : $(date)" | tee -a $LOG_FILE
-
-if [ $USER_ID -ne 0 ]
-then
-    echo -e "$R ERROR: $N Please run the script with root access" | tee -a $LOG_FILE
-    exit 1
-else
-    echo "You are running the script with root access" | tee -a $LOG_FILE
-fi
-
-VALIDATE()
-{
-    if [ $1 -eq 0 ]
-    then
-        echo -e "$2 is ... $G SUCCESS $N" | tee -a $LOG_FILE
-    else
-        echo -e "$2 is ... $R FAILURE $N" | tee -a $LOG_FILE
-        exit 1
-    fi
-}
+check_rootuser
 
 dnf module disable nginx -y &>>$LOG_FILE
 VALIDATE $? "Disabling default nginx version"
@@ -67,7 +39,4 @@ VALIDATE $? "Copying the nginx conf file"
 systemctl restart nginx  &>>$LOG_FILE
 VALIDATE $? "Restarting the nginx"
 
-END_TIME=$(date +%s)
-TOTAL_TIME=$(( $END_TIME - $START_TIME ))
-
-echo -e "Script executed successfully : Time taken $Y $TOTAL_TIME seconds $N" | tee -a $LOG_FILE
+print_time
